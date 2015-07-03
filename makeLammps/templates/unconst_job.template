@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+#$ -V
+#$ -cwd
+#$ -j y
+#$ -S /bin/bash
+#$ -N c%(NMON)dlmpunconst
+#$ -pe ompi 8
+
+#$ -m be
+#$ -M tanmoy.7989@gmail.com
+
+date
+mpiexec -np 8 /home/cask0/home/tsanyal/mylammps/src/./lmp_ZIN_tanmoy -in %(RUNPREFIX)s.in -log %(RUNPREFIX)s.log
+
+

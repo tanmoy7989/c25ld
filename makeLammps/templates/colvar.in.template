@@ -1,0 +1,28 @@
+# colvar input script for umbrella sampling
+
+colvarsTrajFrequency 100
+indexFile polymer.ndx
+colvar {
+	name Rg
+	width 1.0
+	outputValue on
+	lowerBoundary %(LBOUND)f
+	UpperBoundary %(UBOUND)f
+	gyration {
+		atoms { indexGroup polymer }
+	}
+}
+
+harmonic {
+	colvars Rg
+	outputEnergy on
+	outputCenters on
+	
+	forceConstant %(FConst)f
+	centers %(Rg0)f
+	}
+
+histogram {
+	colvars Rg
+	outputFreq %(STEPFREQ)d
+	}
