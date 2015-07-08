@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+#$ -V
+#$ -cwd
+#$ -j y
+#$ -S /bin/bash
+#$ -N c%(NMON)dlmpunconst
+
+date
+/home/cask0/home/tsanyal/mylammps/src/./lmp_ZIN_tanmoy -in %(RUNPREFIX)s.in -log %(RUNPREFIX)s.log
+
+
