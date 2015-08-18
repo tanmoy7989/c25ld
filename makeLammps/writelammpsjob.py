@@ -61,20 +61,27 @@ def unconstrained_job(target_dir, datafileprefix):
 
 ## User Input
 trajdir = sys.argv[1]
-biasfile_lj = sys.argv[2]
-biasfile_wca = sys.argv[3]
+n_mon = int(sys.argv[2])
+n_water = int(sys.argv[3])
+n_poly = int(sys.argv[4])
+doConstrain = bool(sys.argv[5])
+if doConstrain:
+	biasfile_lj = sys.argv[6]
+	biasfile_wca = sys.argv[7]
 
-datafileprefix = 'c50' # changed according to chain length of polymer
+datafileprefix = 'c%d' % chain_length # changed according to chain length of polymer
 
 if not os.path.isfile(os.path.join(trajdir, datafileprefix+'.data')):
 	print "Creating data file..."
 	time.sleep(2)
-	cmdstring = 'python genLammpsData.py 298.0 1700 50 1 ' + datafileprefix + ' ' + trajdir
+	cmdstring = 'python genLammpsData.py 298.0 %d %d %d %s %s' % (n_water, n_mon, n_poly, datafileprefix, trajdir)
 	os.system(cmdstring)
 	
 print "Creating directory structures..."
-#dirs = ['constrained_lj', 'constrained_wca', 'unconstrained_lj', 'unconstrained_wca']
-dirs = ['unconstrained_lj', 'unconstrained_wca']
+if doConstrain:
+	dirs = ['constrained_lj', 'constrained_wca', 'unconstrained_lj', 'unconstrained_wca']
+else:
+	dirs = ['unconstrained_lj', 'unconstrained_wca']
 target_dirs = []
 [target_dirs.append(os.path.join(trajdir, this)) for this in dirs]
 
