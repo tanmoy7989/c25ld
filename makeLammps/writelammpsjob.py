@@ -64,12 +64,12 @@ trajdir = sys.argv[1]
 n_mon = int(sys.argv[2])
 n_water = int(sys.argv[3])
 n_poly = int(sys.argv[4])
-doConstrain = bool(sys.argv[5])
+doConstrain = bool(int(sys.argv[5]))
 if doConstrain:
 	biasfile_lj = sys.argv[6]
 	biasfile_wca = sys.argv[7]
 
-datafileprefix = 'c%d' % chain_length # changed according to chain length of polymer
+datafileprefix = 'c%d' % n_mon # changed according to chain length of polymer
 
 if not os.path.isfile(os.path.join(trajdir, datafileprefix+'.data')):
 	print "Creating data file..."
