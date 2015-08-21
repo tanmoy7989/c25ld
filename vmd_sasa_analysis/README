@@ -1,0 +1,4 @@
+This folder contains Solvent Accessible Surface Area (SASA) calculations 
+with VMD. sasa.tcl is the actual workhorse tcl script that runs vmd
+while test_sasa.py is its python wrapper. Function is similar to compute_geom.py
+kept in /analysis of master branch
