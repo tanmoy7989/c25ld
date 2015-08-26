@@ -39,6 +39,6 @@ def getNPTBoxLen(restartfile, ff_file):
 	
 	
 ##test
-#restartfile = sys.argv[1]
-#ff_file = sys.argv[2]
-#print getNPTBoxLen(restartfile, ff_file)
+restartfile = sys.argv[1]
+ff_file = sys.argv[2]
+print getNPTBoxLen(restartfile, ff_file)
