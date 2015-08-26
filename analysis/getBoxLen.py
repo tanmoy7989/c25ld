@@ -34,7 +34,7 @@ def getNPTBoxLen(restartfile, ff_file):
 		if line.strip().endswith('xhi'):
 			l = line.split()
 			boxlen = float(l[1]) - float(l[0])
-	#os.remove(new_datafile)
+	os.remove(new_datafile)
 	return boxlen
 	
 	
