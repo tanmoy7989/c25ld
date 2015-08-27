@@ -57,14 +57,15 @@ def writeToFile(PElog, Sys):
 
 ## Input from user
 ## Input format:  python cg_MD.py ffield_file Prefix fftype 
-ffield_file = sys.argv[1]
-Prefix = sys.argv[2]
-fftype = sys.argv[3]
-boxlen = sys.argv[4]
+c_len = int(sys.argv[1])
+ffield_file = sys.argv[2]
+Prefix = sys.argv[3]
+fftype = sys.argv[4]
+boxlen = sys.argv[5]
 cgtype = Prefix.split('_')[-1]
 
 ## Generating an energy minimized system
-Sys = makesys.MakeSys(fftype, BoxL = boxlen, Prefix = Prefix)
+Sys = makesys.MakeSys(fftype, BoxL = boxlen, Prefix = Prefix, N_mon = c_len, N_poly = 1)
 Int = Sys.Int
 
 ## Loading the model forcefield into the system
