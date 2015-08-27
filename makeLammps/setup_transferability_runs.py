@@ -6,7 +6,7 @@ import os, sys
 # Globals
 trans_dir = sys.argv[1]
 curr_month = 'aug15'
-c_lens = [15]
+c_lens = [10, 20, 30, 40, 50, 80]
 
 # Dir hierarchy
 def build_dir(c_len):
