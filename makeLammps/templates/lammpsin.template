@@ -37,16 +37,23 @@ neigh_modify every 1 delay 10 check yes
 
 # NPT SIMULATION TO RELAX BOX SIZE FOR CLOSE PACKING
 timestep 1.00
+
+# First with ewald summation turned off
+kspace_modify compute no
 fix relax all npt temp    298.0000    298.0000 100 iso 1.0 1.0 1000.0 
 thermo_style  custom step atoms press temp vol lx ly lz 
-
 run_style 	verlet
+thermo		%(STEPFREQ)d
+restart 	%(RESTARTFREQ)d %(RUNPREFIX)s_relax_no_kspace.prev %(RUNPREFIX)s_relax_no_kspace.curr
+run 		%(RELAXSTEPS)d
+
+# Then with ewald summation turned on
+kspace_modify compute yes mesh 0 0 0
 thermo		%(STEPFREQ)d
 restart 	%(RESTARTFREQ)d %(RUNPREFIX)s_relax.prev %(RUNPREFIX)s_relax.curr
 run 		%(RELAXSTEPS)d
+
 unfix 		relax
-
-
 
 # BERENDSEN EQUILBRATION
 timestep 1.00
