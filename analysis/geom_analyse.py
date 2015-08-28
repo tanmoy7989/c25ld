@@ -12,8 +12,9 @@ import sim
 class Analysis:
 	hist1D_flags = {'kappa' : True, 'R_EE': True, 'SASA' : True, 'Rg': True}
 
-	def __init__(self, trjname, trjtype = 'AA', trjsrc = 'lmp', target_dir = os.getcwd()):
+	def __init__(self, trjname, trjtype = 'AA', trjsrc = 'lmp', target_dir = os.getcwd(), n_mon = 25):
 
+		self.n_mon = n_mon
 		self.trj = trjname; 
 		self.type = trjtype;
 		self.src_code = trjsrc
@@ -35,6 +36,10 @@ class Analysis:
 		proplist = []
 		[proplist.append(key) for key in self.hist1D_flags.keys() if self.hist1D_flags[key]]
 		g = Utils.Geom(traj = self.trj, Prefix = self.gPrefix, target_dir = self.target_dir)
+		## generalized chain length 
+		## added by T.S. on 08/28/2015
+		g.N_poly = 1
+		g.N_mon = self.n_mon
 		for key in self.hist1D_flags.keys():
 			attr = 'has' + key
 			if hasattr(g,attr):
@@ -117,8 +122,9 @@ trjname = argdict['name']
 trjtype = argdict['type']
 trjsrc = argdict['src']
 target_dir = argdict['target_dir']
+n_mon = argdict['n_mon']
 
-a = Analysis(trjname = trjname, trjtype = trjtype, trjsrc = trjsrc, target_dir = target_dir)
+a = Analysis(trjname = trjname, trjtype = trjtype, trjsrc = trjsrc, target_dir = target_dir, n_mon = n_mon)
 
 a.compute_geom()
 a.make_Hist1D(nbins = 50)

@@ -8,29 +8,33 @@ sJobIn = file('/home/cask0/home/tsanyal/job.template').read()
 makeAA = False
 makeLD = True
 
-def makeJobDict(fftype, AAdir, CGdir, target_dir):
+def makeJobDict(fftype, AAdir, CGdir, target_dir, n_mon = 25):
 	
-	T_AA = {'name' : os.path.join(AAdir, 'unconstrained_%s' % fftype, 'c25_unbiased.lammpstrj.gz'),
+	T_AA = {'name' : os.path.join(AAdir, 'unconstrained_%s' % fftype, 'c%d_unbiased.lammpstrj.gz' % n_mon),
 		'type' : 'AA_%s' % fftype,
 	  	'src' : 'lmp',
-	  	'target_dir': target_dir}
+	  	'target_dir': target_dir,
+	  	'n_mon': n_mon}
 
-	T_SP = {'name' : os.path.join(CGdir, 'unconstrained_%s' % fftype, 'SP', 'c25_%s_SP.lammpstrj.gz' % fftype),
+	T_SP = {'name' : os.path.join(CGdir, 'unconstrained_%s' % fftype, 'SP', 'c%d_%s_SP.lammpstrj.gz' % (n_mon, fftype)),
 	  'type' : 'CG_%s_SP' % fftype,
 	  'src' : 'sim',
-	  'target_dir': target_dir}
+	  'target_dir': target_dir,
+	  'n_mon': n_mon}
 	  
 	
-	T_SPLD = {'name' : os.path.join(CGdir, 'unconstrained_%s' % fftype, 'SPLD', 'c25_%s_SPLD.lammpstrj.gz' % fftype),
+	T_SPLD = {'name' : os.path.join(CGdir, 'unconstrained_%s' % fftype, 'SPLD', 'c%d_%s_SPLD.lammpstrj.gz' % (n_mon, fftype)),
 	  'type' : 'CG_%s_SPLD' % fftype,
 	  'src' : 'sim',
-	  'target_dir': target_dir}
+	  'target_dir': target_dir,
+	  'n_mon': n_mon}
 	  
 	if makeLD:
-		T_LD = {'name' : os.path.join(CGdir, 'unconstrained_%s' % fftype, 'LD', 'c25_%s_LD.lammpstrj.gz' % fftype),
+		T_LD = {'name' : os.path.join(CGdir, 'unconstrained_%s' % fftype, 'LD', 'c%d_%s_LD.lammpstrj.gz' % (n_mon, fftype)),
 	  	'type' : 'CG_%s_LD' % fftype,
 	  	'src' : 'sim',
-	  	'target_dir': target_dir}
+	  	'target_dir': target_dir,
+	  	'n_mon': n_mon}
 	else:
 		T_LD = {}
 	  
@@ -83,13 +87,14 @@ def makeJobs(InputFiles, sJobIn, target_dir, fftype):
 AAdir = os.path.abspath(sys.argv[1])
 CGdir = os.path.abspath(sys.argv[2])
 target_dir = os.path.abspath(sys.argv[3])
+c_len = int(sys.argv[4])
 
 os.system('cp geom_analyse.py %s ' % target_dir)
 
 fftypes = ['lj', 'wca']
 for fftype in fftypes:
 
-	jobDict = makeJobDict(fftype, AAdir, CGdir, target_dir)
+	jobDict = makeJobDict(fftype, AAdir, CGdir, target_dir, n_mon = c_len)
 	InputFiles = makeInputFile(jobDict)
 	makeJobs(InputFiles, sJobIn, target_dir, fftype)
 		
