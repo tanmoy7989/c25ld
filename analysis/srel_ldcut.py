@@ -100,12 +100,12 @@ for i, cutoff in enumerate(cutoff_list):
 	Sys.TempSet = TempSet
 	Opt = sim.srel.OptimizeTrajClass(Sys, Map, Traj = Trj, SaveLoadArgData = True, FilePrefix = Prefix)
 	Opt.FilePrefix = Prefix 
-	Opt.MinReweightFrac = 0.001
+	Opt.MinReweightFrac = 0.20
 	sim.srel.optimizetraj.PlotFmt = 'svg'
 	
-	## Lammps settings (can't use till MinReweightFrac can be pre-set)
-	#sim.export.lammps.LammpsExec = '/home/cask0/home/tsanyal/tanmoy_lammps/lammps-15May15/src/lmp_ZIN'
-	#sim.export.lammps.InnerCutoff = 0.01
+	## Lammps settings
+	sim.export.lammps.LammpsExec = '/home/cask0/home/tsanyal/tanmoy_lammps/lammps-15May15/src/lmp_ZIN'
+	sim.export.lammps.InnerCutoff = 0.01
 
 	## Start srel optimization
 	Pspline.SetParam(Knots = 0.)
