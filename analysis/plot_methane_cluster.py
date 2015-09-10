@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 target_dir = sys.argv[1]
 savedir= sys.argv[2]
-fftypes = ['wca']
+fftypes = ['wca', 'lj']
 nrows = len(fftypes); ncols = 1
 
 clrs = ['red', 'blue', 'green', 'cyan']

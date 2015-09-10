@@ -23,6 +23,7 @@ class Geom:
 		isDataPickled = False	
 		isPickled = False
 		doMinimage = True
+                useVMD_SASA = True
 		
 		hasRg = True
 		hasR_EE = True

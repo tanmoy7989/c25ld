@@ -32,12 +32,12 @@ def prune_axis(axis):
 #-------------------------------------------------------------------------------
 
 # data and target locations
-c25_dir = os.path.abspath('../data/analysis/feb15_runs_fsw')
-c40_dir = os.path.abspath('../data/analysis/transferability/c40')
-c50_dir = os.path.abspath('../data/analysis/transferability/c50')
-c18_dir = os.path.abspath('../data/analysis/transferability/c18')
-c12_dir = os.path.abspath('../data/analysis/transferability/c12')
-c25_poly_dir = os.path.abspath('../data/analysis/polymer')
+c10_dir = os.path.abspath('../data/analysis/aug15_transferability/c10')
+c20_dir = os.path.abspath('../data/analysis/aug15_transferability/c20')
+c30_dir = os.path.abspath('../data/analysis/aug15_transferability/c30')
+c40_dir = os.path.abspath('../data/analysis/aug15_transferability/c40')
+c50_dir = os.path.abspath('../data/analysis/aug15_transferability/c50')
+#c25_poly_dir = os.path.abspath('../data/analysis/polymer')
 
 savedir = sys.argv[1]
 fftype = sys.argv[2]
@@ -48,9 +48,9 @@ fftype = sys.argv[2]
 #case_dirs = {1: c25_poly_dir, 2: c25_dir, 3: c40_dir, 4: c50_dir, 5: c12_dir, 6: c18_dir}
 #titles = {1: 'dry_polymer', 2: 'c25', 3: 'c40', 4: 'c50', 5: 'c12 X 3', 6: 'c18 X 2'} 
 
-ncases = 4
-case_dirs = {1: c25_dir, 2: c40_dir, 3: c18_dir, 4: c12_dir}
-titles = {1: 'c25', 2: 'c40', 3: 'c18 X 2', 4: 'c12 X 3'} 
+ncases = 5
+case_dirs = {1: c10_dir, 2: c20_dir, 3: c30_dir, 4: c40_dir, 5: c50_dir}
+titles = {1: 'c10', 2: 'c20', 3: 'c30', 4: 'c40', 5: 'c50'} 
 
 cgtypes = {1: 'SP', 2: 'SPLD', 3: 'LD'}
 
