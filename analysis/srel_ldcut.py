@@ -14,7 +14,7 @@ d = getModelData()
 poly_dict = d['poly_dict']
 TempSet = d['TempSet']
 
-NStep = {'Stepsize': 0.003, 'Equil': 1000000, 'Prod': 10000000, 'Freq': 100}
+NStep = {'Stepsize': 0.003, 'Equil': 1000000, 'Prod': 2000000, 'Freq': 100}
 
 
 def parseTraj(lammpstraj):
@@ -51,6 +51,7 @@ lammpstraj = sys.argv[1]
 fftype = sys.argv[2]
 BasePrefix = sys.argv[3]
 DataLogPrefix = BasePrefix
+cutoff_list = np.arange(3.1, 8.0, 0.1)
 
 (Trj, boxlen, mappedatoms)  = parseTraj(lammpstraj)
 of = open(DataLogPrefix + '.dat', 'w')
@@ -64,58 +65,82 @@ print "Number of polymer molecules = ", poly_dict["N_poly"]
 print "Number of monomers = ", poly_dict["N_mon"]
 print "Length of simulation box = ", boxlen
 
-## Start cutoff loop
-cutoff_list = np.arange(3.0, 8.0,0.1)
-for i, cutoff in enumerate(cutoff_list):
+## Create the energy-minimized System object
+Sys = makesys.MakeSys(fftype = fftype, BoxL = boxlen, Prefix = BasePrefix, LDCut = cutoff_list[0])
+Int = Sys.Int
+
+#shortcuts to potentials
+Plj = Sys.ForceField[0]
+Pspline = Sys.ForceField[1]
+Pld = Sys.ForceField[2]
+
+#change to MD
+Int.Method = Int.Methods.VVIntegrate
+Int.Method.TimeStep = NStep['Stepsize']
+Int.Method.Thermostat = Int.Method.ThermostatLangevin
+Int.Method.LangevinGamma = 0.01
+Sys.TempSet = TempSet
+## Mapping function
+Map = sim.atommap.PosMap()
+for (i, a) in enumerate(Sys.Atom):
+	Map += [sim.atommap.AtomMap(Atoms1 = mappedatoms[i], Atom2 = a)]
+
+## Spline treatment
+Pspline.EneSlopeInner = None
+
+## Set up Srel optimizer
+Sys.TempSet = TempSet
+Opt = sim.srel.OptimizeTrajClass(Sys, Map, Traj = Trj, SaveLoadArgData = True, FilePrefix = BasePrefix)
+sim.srel.optimizetraj.PlotFmt = 'svg'
 	
-	## Misc
+## Start initial srel optimization
+def ResetPotentials():
+	print "Resetting all potentials to base case and freezing."
+	Plj.SetParam(Epsilon = poly_dict["LJEpsilon"], Sigma = poly_dict["LJSigma"])
+	Pspline.SetParam(Knots = 0.)
+	Pld.SetParam(Knots = 0.)
+	for ptype in Sys.ForceField:
+		ptype.FreezeParam()
+	
+opt_cases = ["SP", "SPLD"]
+print "Starting initial Srel minimization..."
+for i, case in enumerate(opt_cases):
+	print "\n\nOptimizing for the case: ", case
+	Opt.FilePrefix = BasePrefix + '_init_%s' % case
+	if case == "SP":
+		ResetPotentials()
+        Plj.SetParam(Epsilon = 0., Sigma = 1.e-10)
+        Pspline.UnfreezeParam()
+        print "Turned off LJ potential."
+        print "Unfrozen potential = SP"
+	
+	if case == "SPLD":
+		Pld.UnfreezeParam()
+		print "Unfrozen potentials = SP, LD"
+	
+	Sys.ForceField.Update()
+	Opt.RunConjugateGradient(StepsEquil = NStep['Equil'],
+                             StepsProd = NStep['Prod'],
+                             StepsStride = NStep['Freq']) 
+	
+	
+## Start cutoff loop
+for i, cutoff in enumerate(cutoff_list[1:]):
 	print 'Local Density Cutoff = %d' % cutoff
 	Prefix = BasePrefix + '_%d' % i
 	
-	## Create the energy-minimized System object
-	Sys = makesys.MakeSys(fftype = fftype, BoxL = boxlen, Prefix = Prefix, LDCut = cutoff)
-	Int = Sys.Int
-
-	#shortcuts to potentials
-	Plj = Sys.ForceField[0]
-	Pspline = Sys.ForceField[1]
-	Pld = Sys.ForceField[2]
-
-	#change to MD
-	Int.Method = Int.Methods.VVIntegrate
-	Int.Method.TimeStep = NStep['Stepsize']
-	Int.Method.Thermostat = Int.Method.ThermostatLangevin
-	Int.Method.LangevinGamma = 0.01
-	Sys.TempSet = TempSet
-
-	## Mapping function
-	Map = sim.atommap.PosMap()
-	for (i, a) in enumerate(Sys.Atom):
-	    Map += [sim.atommap.AtomMap(Atoms1 = mappedatoms[i], Atom2 = a)]
-
-	## Spline treatment
-	Pspline.EneSlopeInner = None
-
-	## Set up Srel optimizer
-	Sys.TempSet = TempSet
-	Opt = sim.srel.OptimizeTrajClass(Sys, Map, Traj = Trj, SaveLoadArgData = True, FilePrefix = Prefix)
-	Opt.FilePrefix = Prefix 
-	Opt.MinReweightFrac = 0.20
-	sim.srel.optimizetraj.PlotFmt = 'svg'
-	
-	## Lammps settings
-	sim.export.lammps.LammpsExec = '/home/cask0/home/tsanyal/tanmoy_lammps/lammps-15May15/src/lmp_ZIN'
-	sim.export.lammps.InnerCutoff = 0.01
-
-	## Start srel optimization
-	Pspline.SetParam(Knots = 0.)
-	Pld.SetParam(Knots = 0.)
+	Sys.ForceField[2].SetCut(Cut = cutoff, InnerCut = cutoff - 1.2)
 	Sys.ForceField.Update()
-	Opt.RunConjugateGradient(StepsEquil = NStep['Equil'], StepsProd = NStep['Prod'], StepsStride = NStep['Freq']) 
+	
+	Opt.FilePrefix = Prefix
+	Opt.MinReweightFrac = 0.2
+	Opt.Reset()
+	Opt.RunConjugateGradient(StepsEquil = NStep['Equil'],
+                             StepsProd = NStep['Prod'],
+                             StepsStride = NStep['Freq'])
 	
 	## Log data
-	lines = open(Prefix + '_log.txt', 'r').readlines()
-	srel = float(lines[-1].split()[2]) 
 	of = open(DataLog + '.dat', 'a')
-	of.write('%g\t %g\n' % (cutoff, srel))
+	of.write('%g\t %g\n' % (cutoff, Opt.Srel))
 	of.close()
+	
