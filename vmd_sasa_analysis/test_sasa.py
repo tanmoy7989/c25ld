@@ -6,18 +6,19 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 # Run vmd
-def run_vmd(traj, vmd_outprefix):
+def run_vmd(traj, vmd_outprefix, mon_start = 0, mon_end = 25, mon_type = 0):
 	if not os.path.isfile(traj):
 		print '%s not found\n' % traj
 		return
 
 	vmd_params = {'tclscript': 'sasa.tcl', 
-	      	      'serial_start': 0, 'serial_end': 25,
+	      	      'serial_start': mon_start, 'serial_end': mon_end,
 	      	      'start': 0, 'end': -1, 'freq': 100,
 	      	      'trajfile': traj,
-		      'outprefix': vmd_outprefix}
+		      'outprefix': vmd_outprefix,
+		      'mon_type' : mon_type}
 
-	vmdstring = 'vmd -dispdev text -e %(tclscript)s -args %(trajfile)s %(outprefix)s %(serial_start)d %(serial_end)d %(start)d %(end)d %(freq)d' % vmd_params
+	vmdstring = 'vmd -dispdev text -e %(tclscript)s -args %(trajfile)s %(outprefix)s %(serial_start)d %(serial_end)d %(start)d %(end)d %(freq)d %(mon_type)d' % vmd_params
 	os.system(vmdstring)
 
 
@@ -57,18 +58,23 @@ def plot_sasa(outpickle, cgtype, ax):
 		print '%s not found\n' % outpickle
 	style = {'AA': '-r', 'SP': 'b-', 'SPLD': 'g--', 'LD': 'b:'}
 	ax.plot(x,y, style[cgtype], linewidth = 3, label = cgtype)
+	ax.legend()
 
 
 
 ##### Main
 data_dir = os.path.abspath('../data/traj')
-analysis_dir = os.path.join('../data/analysis')
+analysis_dir = os.path.abspath('../data/analysis')
 fftypes = ['wca', 'lj']
-cgtypes = ['AA', 'SP', 'SPLD', 'LD']
-trajtypes = ['AA', 'CG']
+cgtypes = ['SP', 'SPLD', 'LD', 'AA']
+trajtypes = ['CG', 'AA']
+
+## user input
+n_mon = int(sys.argv[1]) #chain  length
+n_water = int(sys.argv[2]) #number of waters
 
 # filename formats
-trajfile_format = 'c25_%s_%s.lammpstrj'
+trajfile_format = 'c%d_%s_%s.lammpstrj'
 vmd_outprefix_format = '%s_sasa_%s_%s'
 outpicklePrefix_format = '%s_%s_%s_hist1D_SASA_atom'
 
@@ -79,16 +85,21 @@ axs = {'LJ': fig.add_subplot(1,2,1), 'WCA': fig.add_subplot(1,2,2)}
 
 for fftype in fftypes:
 	for cgtype in cgtypes:
-		trajfile = os.path.join(data_dir, trajfile_format % (fftype, cgtype))
+		trajfile = os.path.join(data_dir, trajfile_format % (n_mon, fftype, cgtype))
 		if cgtype == 'AA': 
+			mon_type = 3
 			trajtype = 'AA'
+			mon_start = 3*n_water; mon_end = 3*n_water+n_mon - 1
 		else:
+			mon_type = 0
 			trajtype = 'CG'
+			mon_start = 0; mon_end = n_mon - 1
 		vmd_outprefix = os.path.join(analysis_dir, vmd_outprefix_format % (trajtype, fftype, cgtype))
 		outpicklePrefix = os.path.join(analysis_dir, outpicklePrefix_format % (trajtype, fftype, cgtype))
-	
-		run_vmd(traj = trajfile, vmd_outprefix = vmd_outprefix)
-		makeHist(vmd_outfile = vmd_outprefix + '.dat', outpicklePrefix = outpicklePrefix)
+			
+		if cgtype == 'AA':
+			run_vmd(traj = trajfile, vmd_outprefix = vmd_outprefix, mon_type = mon_type)
+			makeHist(vmd_outfile = vmd_outprefix + '.dat', outpicklePrefix = outpicklePrefix)
 		plot_sasa(outpickle = outpicklePrefix + '.pickle', cgtype = cgtype, ax = axs[fftype.upper()])
 
 
@@ -109,3 +120,5 @@ axs['WCA'].set_ylabel('')
 
 plt.subplots_adjust(left = 0.15, bottom = 0.15, wspace = 0)
 plt.savefig('sasa.svg', dpi = 300)
+
+plt.show()
