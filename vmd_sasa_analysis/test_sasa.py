@@ -13,7 +13,7 @@ def run_vmd(traj, vmd_outprefix, mon_start = 0, mon_end = 25, mon_type = 0):
 
 	vmd_params = {'tclscript': 'sasa.tcl', 
 	      	      'serial_start': mon_start, 'serial_end': mon_end,
-	      	      'start': 0, 'end': -1, 'freq': 100,
+	      	      'start': 0, 'end': -1, 'freq': 5,
 	      	      'trajfile': traj,
 		      'outprefix': vmd_outprefix,
 		      'mon_type' : mon_type}
@@ -66,8 +66,8 @@ def plot_sasa(outpickle, cgtype, ax):
 data_dir = os.path.abspath('../data/traj')
 analysis_dir = os.path.abspath('../data/analysis')
 fftypes = ['wca', 'lj']
-cgtypes = ['SP', 'SPLD', 'LD', 'AA']
-trajtypes = ['CG', 'AA']
+cgtypes = ['SP', 'SPLD', 'LD']#, 'AA']
+trajtypes = ['CG']#, 'AA']
 
 ## user input
 n_mon = int(sys.argv[1]) #chain  length
@@ -89,17 +89,16 @@ for fftype in fftypes:
 		if cgtype == 'AA': 
 			mon_type = 3
 			trajtype = 'AA'
-			mon_start = 3*n_water; mon_end = 3*n_water+n_mon - 1
+			mon_start = 3*n_water + 1; mon_end = 3*n_water+n_mon
 		else:
 			mon_type = 0
 			trajtype = 'CG'
-			mon_start = 0; mon_end = n_mon - 1
+			mon_start = 1; mon_end = n_mon 
 		vmd_outprefix = os.path.join(analysis_dir, vmd_outprefix_format % (trajtype, fftype, cgtype))
 		outpicklePrefix = os.path.join(analysis_dir, outpicklePrefix_format % (trajtype, fftype, cgtype))
 			
-		if cgtype == 'AA':
-			run_vmd(traj = trajfile, vmd_outprefix = vmd_outprefix, mon_type = mon_type)
-			makeHist(vmd_outfile = vmd_outprefix + '.dat', outpicklePrefix = outpicklePrefix)
+		run_vmd(traj = trajfile, vmd_outprefix = vmd_outprefix, mon_type = mon_type)
+		makeHist(vmd_outfile = vmd_outprefix + '.dat', outpicklePrefix = outpicklePrefix, normalize = True)
 		plot_sasa(outpickle = outpicklePrefix + '.pickle', cgtype = cgtype, ax = axs[fftype.upper()])
 
 
