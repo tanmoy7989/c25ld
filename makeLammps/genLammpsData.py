@@ -9,7 +9,8 @@ sys.dont_write_bytecode = True
 
 
 template_dir =  "./templates"
-
+writePDB = True
+writeLammpsData = True
 
 ### User supplied data
 sys_temp = sys.argv[1]
@@ -40,17 +41,18 @@ sol.cleanup()
 
 
 #### Call Lammps Input generator module
-import makeLammpsData as makeLammps
-pdbfile = os.path.join(os.getcwd(), "solvated_poly.pdb")
-pdbstring = makeLammps.getData(pdbfile)
-atomstring = makeLammps.makeAtoms(pdbstring)
-bondstring = makeLammps.makeBonds(atomstring)
-anglestring = makeLammps.makeAngles(bondstring)
-makeLammps.writeLammpsData((atomstring,bondstring,anglestring), datafilename, boxpos)
+if writeLammpsData:
+    import makeLammpsData as makeLammps
+    pdbfile = os.path.join(os.getcwd(), "solvated_poly.pdb")
+    pdbstring = makeLammps.getData(pdbfile)
+    atomstring = makeLammps.makeAtoms(pdbstring)
+    bondstring = makeLammps.makeBonds(atomstring)
+    anglestring = makeLammps.makeAngles(bondstring)
+    makeLammps.writeLammpsData((atomstring,bondstring,anglestring), datafilename, boxpos)
 
 
 #### clean things up 
 print "Cleaning up..."
-os.remove("solvated_poly.pdb")
+if not writePDB:    os.remove("solvated_poly.pdb")
 
 
