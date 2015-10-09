@@ -27,7 +27,8 @@ def sasa_mdtraj(trajfile, datafile, outprefix, serial_start = 0, serial_end = 25
 		
 	# run teh sasa calculator
 	sasa = md.shrake_rupley(traj = polymer_sel, probe_radius = w_rad, mode = 'atom')
-	
+	sasa *= 100 #conversion from nm^2 to A^2
+
 	outfile = outprefix + '.dat'
 	np.savetxt(outfile, sasa)
 
