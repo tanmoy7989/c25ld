@@ -11,6 +11,9 @@ from chem_data import getModelData
 d = getModelData()
 poly_dict = d['poly_dict']
 
+MinImageDEBUG = False
+
+
 class Geom:
 
 		''' Class for defining computation for geometrical properties
@@ -23,7 +26,6 @@ class Geom:
 		isDataPickled = False	
 		isPickled = False
 		doMinimage = True
-                useVMD_SASA = True
 		
 		hasRg = True
 		hasR_EE = True
@@ -104,7 +106,9 @@ class Geom:
 				if self.doMinimage:
 					for i in range(1, self.N_mon * self.N_poly):
     						Pos[i] = sim.geom.Reimage(Pos[i], Pos[i-1], BoxL)
-				
+				if MinImageDEBUG:
+				    print BoxL
+				    print Pos; raw_input()
 				## per-polymer
 				for j in range(self.N_poly):
 					Pos_poly = Pos[j*self.N_mon : (j+1)*self.N_mon]
