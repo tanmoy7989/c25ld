@@ -4,7 +4,7 @@ import numpy as np
 import os, sys, pickle
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-import sasa_mdtraj
+import sasa_mdtraj, sasa_sim
 
 # GLOBALS
 data_dir = os.path.abspath('../data/traj')
@@ -21,7 +21,7 @@ def run_vmd(traj, outprefix, mon_start = 0, mon_end = 25, mon_type = 0, trajtype
 	#trajtype is depreciated; not used
 	vmd_params = {'tclscript': vmd_tclscript , 
 	      	      'serial_start': mon_start, 'serial_end': mon_end,
-	      	      'start': 0, 'end': -1, 'freq': 5,
+	      	      'start': 0, 'end': -1, 'freq': 10,
 	      	      'trajfile': traj,
 		      'outprefix': outprefix,
 		      'mon_type' : mon_type}
@@ -39,7 +39,17 @@ def run_mdtraj(traj, outprefix, mon_start = 0, mon_end = 25, mon_type = 0, trajt
 	datafile = pdb_datafiles[trajtype]
 	sasa_mdtraj(trajfile = traj, datafile = datafile, outprefix = outprefix, 
 		    serial_start = mon_start, serial_end = mon_end, mon_type = mon_type,
-	    	    start = 0, stop = -1, freq = 5)
+	    	    start = 0, stop = -1, freq = 10)
+
+# Per atom SASA calculation with sim
+def run_sim(traj, outprefix, mon_start = 0, mon_end = 25, mon_type = 0, trajtype = 'CG'):
+	if not os.path.isfile(traj):
+		print '%s not found\n' % traj
+		return
+	
+	sasa_sim(trajfile = traj, outprefix = outprefix, 
+		 serial_start = mon_start, serial_end = mon_end, mon_type = mon_type,
+	    	 start = 0, stop = -1, freq = 10)
 
 
 # Rules for determining params to be passed to SASA calc routines
@@ -48,10 +58,12 @@ def getParams(cgtype, method, n_water, n_mon):
 	# add more rules if more software found to calculate sasa
 	if not (cgtype == 'AA'): cgtype = 'CG'
 	
-	ret = {('AA', 'vmd') : (3*n_water+1, 3*n_water+n_mon, 3, 'AA'),
-	       ('CG', 'vmd') : (1, n_mon, 0, 'CG'),
+	ret = {('AA', 'vmd') : (3*n_water, 3*n_water+n_mon-1, 3, 'AA'),
+	       ('CG', 'vmd') : (0, n_mon-1, 0, 'CG'),
 	       ('AA', 'mdtraj') : (3*n_water, 3*n_water+n_mon, 3, 'AA'),
-	       ('CG', 'mdtraj') : (0, n_mon, 0, 'CG')}
+	       ('CG', 'mdtraj') : (0, n_mon, 0, 'CG'),
+	       ('AA', 'sim') : (3*n_water, 3*n_water+n_mon, 3, 'AA'),
+	       ('CG', 'sim') : (0, n_mon, 0, 'CG')}
 
 	return ret[(cgtype, method)] 	
 
@@ -65,7 +77,7 @@ def makeHist(outfile, outpicklePrefix, normalize = False, delTempfiles = False):
 		return
 	nframes = len(sasa)
 	sasa_min = 0.98 * np.min(sasa)
-	sasa_max = 1.02 * np.max(sasa)
+	sasa_max =  1.02 * np.max(sasa)
 	nbins = 50
 	delta = (sasa_max - sasa_min)/float(nbins)
 	bin_centers = np.zeros([nbins], np.float64)
@@ -77,6 +89,7 @@ def makeHist(outfile, outpicklePrefix, normalize = False, delTempfiles = False):
 		this_sasa = sasa[n,:]
 		for this_n in range(len(this_sasa)):
 			assignment = int((this_sasa[this_n] - sasa_min)/delta)
+			if assignment == nbins: assignment = nbins - 1			
 			bin_vals[assignment] += 1.0
 	
 	bin_vals /= nframes
@@ -100,10 +113,12 @@ def plot_sasa(outpickle, cgtype, ax):
 
 ##### Main
 fftypes = ['wca', 'lj']
-cgtypes = ['SP', 'SPLD', 'LD', 'AA']
-trajtypes = ['CG', 'AA']
-methods = {'vmd': run_vmd , 
-	   'mdtraj': run_mdtraj} #add more functions here later if need be
+cgtypes = ['SP', 'SPLD', 'LD'] #, 'AA']
+trajtypes = ['CG'] #, 'AA']
+methods = {'vmd': run_vmd}
+#methods = {'vmd': run_vmd, 
+#	   'mdtraj': run_mdtraj,
+#	   'sim' : run_sim} #add more functions here later if need be
 
 ## user input
 n_mon = int(sys.argv[1]) #chain  length

@@ -8,6 +8,7 @@ set stop       		[lindex $argv 5]
 set freq       		[lindex $argv 6]
 set mon_type		[lindex $argv 7]
 
+
 # Read in files
 set maxframes  [expr int(($stop-$start)/$freq)]	
 mol new $trajfile first $start last $stop step $freq waitfor $maxframes
@@ -24,11 +25,11 @@ $polymer_sel set radius $mon_rad
 # SASA calculation loop
 for {set i 0} {$i <= $nframes} {incr i $freq} {
 	molinfo top set frame $i
-	for {set j $serial_start} {$j < $serial_end} {incr j} {	
+	for {set j $serial_start} {$j <= $serial_end} {incr j} {	
 		set monomer_sel [atomselect top "index $j"]				
 		set sasa [measure sasa $w_rad $polymer_sel -restrict $monomer_sel]
 		puts -nonewline $output "$sasa\t"
-	}
+		}
 	puts $output "\n"
 }
 close $output
