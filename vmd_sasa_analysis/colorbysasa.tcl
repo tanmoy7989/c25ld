@@ -1,6 +1,6 @@
 ### USAGE:
-## For CG:-  vmd dispdev win -e colorbysasa.tcl -args <lammpstraj> 0 25 0 20000 10 0 
-## For AA:-  vmd dispdev win -e colorbysasa.tcl -args <lammpstraj> 5100 5125 0 20000 100 3
+## For CG:-  vmd -dispdev win -e colorbysasa.tcl -args <lammpstraj> 0 25 0 20000 10 0 
+## For AA:-  vmd -dispdev win -e colorbysasa.tcl -args <lammpstraj> 5100 5125 0 20000 100 3
 
 
 # Coloring routine
@@ -15,7 +15,7 @@ proc colorbysasa {polymer_sel serial_start serial_stop} {
 		$monomer_sel delete
 	}
 	mol modcolor 0 [molinfo top] User
-	mol colupdate 0 [molinfo top] 1
+	#mol colupdate 0 [molinfo top] 1
 	mol scaleminmax [molinfo top] 0 auto
 }
 
@@ -36,6 +36,9 @@ mol new $trajfile first $start last $stop step $freq waitfor $maxframes
 
 set mon_rad 2.0934
 set w_rad 1.4
+mol modstyle 0 top VDW
+color Display Background white
+display projection orthographic
 
 set nframes [molinfo top get numframes]
 set polymer_sel [atomselect top "type $mon_type"]

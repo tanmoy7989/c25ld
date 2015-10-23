@@ -7,9 +7,12 @@ from matplotlib.ticker import MaxNLocator
 import sasa_mdtraj, sasa_sim
 
 # GLOBALS
-data_dir = os.path.abspath('../data/traj')
-analysis_dir = os.path.abspath('../data/analysis')
-pdb_datafiles = {'AA': os.path.join(data_dir, 'c25_AA_data.pdb'), 'CG': os.path.join(data_dir, 'c25_CG_data.pdb')}
+plot_fmt = 'svg'
+plot_dir = os.path.abspath('../data/plots')
+data_dir = {} ; analysis_dir = {}
+for key in ['c10', 'c20', 'c30', 'c40', 'c50', 'c25']:
+	data_dir[key] = os.path.abspath('../data/traj/%s' % key)
+	analysis_dir[key] = os.path.abspath('../data/analysis/%s' % key)
 vmd_tclscript = os.path.join(os.getcwd(), 'sasa_vmd.tcl')
 
 # Per atom SASA calculation with vmd
@@ -49,7 +52,7 @@ def run_sim(traj, outprefix, mon_start = 0, mon_end = 25, mon_type = 0, trajtype
 	
 	sasa_sim(trajfile = traj, outprefix = outprefix, 
 		 serial_start = mon_start, serial_end = mon_end, mon_type = mon_type,
-	    	 start = 0, stop = -1, freq = 10)
+	    	 start = 0, stop = -1, freq = 100)
 
 
 # Rules for determining params to be passed to SASA calc routines
@@ -75,25 +78,26 @@ def makeHist(outfile, outpicklePrefix, normalize = False, delTempfiles = False):
 	except ValueError:
 		print 'Weird ValueError'
 		return
-	nframes = len(sasa)
-	sasa_min = 0.98 * np.min(sasa)
+	nframes = sasa.shape[0]
+	sasa_min = 0.8 * np.min(sasa)
 	sasa_max =  1.02 * np.max(sasa)
-	nbins = 50
+	nbins = 30
 	delta = (sasa_max - sasa_min)/float(nbins)
 	bin_centers = np.zeros([nbins], np.float64)
 	bin_vals = np.zeros([nbins], np.float64)
+	refined_delta = np.zeros([nbins], np.float64)
 	for i in range(nbins):
 		bin_centers[i] = sasa_min + (i + 0.5)*delta
 	
-	for n in range(nframes):	
-		this_sasa = sasa[n,:]
-		for this_n in range(len(this_sasa)):
-			assignment = int((this_sasa[this_n] - sasa_min)/delta)
-			if assignment == nbins: assignment = nbins - 1			
-			bin_vals[assignment] += 1.0
 	
-	bin_vals /= nframes
-	if normalize:	bin_vals /= (np.sum(bin_vals) * delta)
+	sasa = np.ndarray.flatten(sasa)
+	for n in range(len(sasa)):
+		assignment = int((sasa[n] - sasa_min)/delta)		
+		bin_vals[assignment] += 1.0
+
+	
+	bin_vals /= len(sasa)
+	if normalize:	bin_vals /= (np.trapz(bin_vals, bin_centers, dx = delta))
 	if delTempfiles:	os.remove(outfile)
 	pickle.dump((bin_centers,bin_vals), open(outpicklePrefix + '.pickle', 'w'))
 	
@@ -128,7 +132,7 @@ n_water = int(sys.argv[2]) #number of waters
 trajfile_format = 'c%d_%s_%s.lammpstrj'
 outprefix_base_fmt = '%s_sasa_%s_%s_%s'
 outpicklePrefix_base_fmt = '%s_%s_%s_hist1D_SASA_atom_%s'
-
+pdb_datafiles = {'AA': os.path.join(data_dir['c%d' % n_mon], 'c25_AA_data.pdb'), 'CG': os.path.join(data_dir['c%d' % n_mon], 'c25_CG_data.pdb')}
 
 for method in methods.keys():
 	# fig initialization
@@ -137,14 +141,14 @@ for method in methods.keys():
 
 	for fftype in fftypes:
 		for cgtype in cgtypes:
-			trajfile = os.path.join(data_dir, trajfile_format % (n_mon, fftype, cgtype))
+			trajfile = os.path.join(data_dir['c%d' % n_mon], trajfile_format % (n_mon, fftype, cgtype))
 			mon_start, mon_end, mon_type, trajtype = getParams(cgtype = cgtype, method = method, n_mon = n_mon, n_water = n_water)			
 			
-			outprefix = os.path.join(analysis_dir, outprefix_base_fmt % (trajtype, fftype, cgtype, method))
-			outpicklePrefix = os.path.join(analysis_dir, outpicklePrefix_base_fmt % (trajtype, fftype, cgtype, method))
+			outprefix = os.path.join(analysis_dir['c%d' % n_mon], outprefix_base_fmt % (trajtype, fftype, cgtype, method))
+			outpicklePrefix = os.path.join(analysis_dir['c%d' % n_mon], outpicklePrefix_base_fmt % (trajtype, fftype, cgtype, method))
 			
 			fnSASA = methods[method]
-			fnSASA(traj = trajfile, outprefix = outprefix, mon_start = mon_start, mon_end = mon_end, mon_type = mon_type, trajtype = trajtype)			
+			#fnSASA(traj = trajfile, outprefix = outprefix, mon_start = mon_start, mon_end = mon_end, mon_type = mon_type, trajtype = trajtype)			
 			
 			makeHist(outfile = outprefix + '.dat', outpicklePrefix = outpicklePrefix, normalize = True)
 
@@ -166,7 +170,7 @@ for method in methods.keys():
 	axs['WCA'].set_ylabel('')
 
 	plt.subplots_adjust(left = 0.15, bottom = 0.15, wspace = 0)
-	figname = 'sasa_%s.svg' % method
+	figname = os.path.join(plot_dir, 'sasa_%d_%s.%s' % (n_mon, method, plot_fmt))
 	plt.savefig(figname, dpi = 300)
 
 plt.show()

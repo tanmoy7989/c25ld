@@ -6,7 +6,7 @@
 #$ -S /bin/bash
 #$ -N vmd_sasa
 date
-python test_sasa.py 25 1700
+python test_sasa.py 10 1700
 
 
 
