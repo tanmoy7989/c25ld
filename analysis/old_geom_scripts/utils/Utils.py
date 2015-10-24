@@ -220,8 +220,8 @@ class Hist:
 			frameStatus.Update(i)
 		
 		if normalize:
-			bin_vals /= (np.sum(bin_vals) * delta)
-
+			#bin_vals /= (np.sum(bin_vals) * delta)
+			bin_vals /= np.trapz(bin_vals, bin_centers, dx = delta)
 		if doPMF:
 			pmf = - np.log(bin_vals)
 		
