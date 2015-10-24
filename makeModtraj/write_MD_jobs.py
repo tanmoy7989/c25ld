@@ -10,7 +10,7 @@ from getBoxL import getNPTBoxLen
 ## Constant values
 fftypes = ['lj', 'wca']
 cgtypes = ['SP', 'SPLD', 'LD']
-
+curr_dir = os.getcwd()
 sJobIn = file(os.path.expanduser('~/job.template')).read()
 
 ## changed this function to get 
@@ -47,8 +47,10 @@ def unconst_job(ffdir, targetdir, AAdir, c_len):
 			d['hasMAIL'] = ''
 			sJob = os.path.join(this_targetdir, Prefix + '.sh')
 			file(sJob, "w").write(sJobIn % d)
-			os.system('chmod 777 ' + sJob)
 			
+			os.chdir(os.path.dirname(sJob))
+			os.system('chmod 777 %s ; qsub %s' % (sJob, sJob))
+			os.chdir(curr_dir)
 
 def const_job(ffdir, targetdir, biasfiles):
 	for fftype in fftypes:

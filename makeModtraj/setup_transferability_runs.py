@@ -8,7 +8,7 @@ trans_CGdir = sys.argv[1]
 trans_AAdir = sys.argv[2]
 curr_month = 'aug15'
 c_lens = [10, 20, 30, 40, 50, 80]
-c25ffdir = os.path.expanduser('~/c25ld/cg_ff/feb15_runs_fsw')
+c25ffdir = os.path.expanduser('~/c25ld/data/cg_ff/feb15_runs_fsw')
 
 # Dir hierarchy
 def build_dir(c_len):
