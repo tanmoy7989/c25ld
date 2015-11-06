@@ -10,10 +10,10 @@ analysis_dir = os.path.expanduser('~/c25ld/data/analysis')
 Measures = ['Rg', 'R_EE', 'kappa', 'SASA_atom', 'pmf_Rg_R_EE']
 cgtypes = ['AA', 'SP', 'SPLD', 'LD']
 fftypes = ['lj', 'wca']
-linestyles = {'AA': ('red', 'o'), 
-              'SP': ('blue','-'), 
-              'SPLD': ('green', '--' ), 
-              'LD': ('black', ':')}
+linestyles = {'AA': ('red', 'None', 'o'), 
+              'SP': ('blue','-', 'None'), 
+              'SPLD': ('green', '--', 'None' ), 
+              'LD': ('black', ':', 'None')} # (color, linestyle, markerstyle)
 
 axlbls = {'Rg': r'$Rg (\AA)$', 
           'R_EE': r'$R_{EE} (\AA)$',
@@ -51,7 +51,8 @@ for measure in Measures[:-1]:
             except IOError:
                 print 'c%d (%s, %s) data not there for %s' % (chain_length, fftype, cgtype, measure)
                 continue
-            ax.plot(x, y, linewidth = 3, color = linestyles[cgtype][0], linestyle = linestyles[cgtype][1], label = cgtype)
+            ax.plot(x, y, linewidth = 3, markersize = 8, label = cgtype, color = linestyles[cgtype][0], 
+                    linestyle = linestyles[cgtype][1], marker = linestyles[cgtype][2])
             
         # design
         ax.set_xlabel(axlbls[measure], fontsize = 'large'); ax.set_ylabel(axlbls['Dist'], fontsize = 'large')           
