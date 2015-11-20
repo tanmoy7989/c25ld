@@ -10,7 +10,7 @@ Chain_length        Nwater      TrajType                TrajFile
 25                  0000            (wca,LD)               modtraj/feb15_runs_fsw/unconstrained_wca/LD/c25_wca_LD.lammpstrj.gz
 geom_prop/c25
 
-10                  1700            (lj,AA)                lammpstraj/aug10_transferability_runs/aug15_runs_c10/unconstrained_lj/c10_unbiased.lammpstrj.gz
+10                  1700            (lj,AA)                lammpstraj/aug15_transferability_runs/aug15_runs_c10/unconstrained_lj/c10_unbiased.lammpstrj.gz
 10                  1700            (wca,AA)               lammpstraj/aug15_transferability_runs/aug15_runs_c10/unconstrained_wca/c10_unbiased.lammpstrj.gz
 10                  0000            (lj,SP)                modtraj/aug15_transferability_runs/aug15_runs_c10/unconstrained_lj/SP/c10_lj_SP.lammpstrj.gz
 10                  0000            (lj,SPLD)              modtraj/aug15_transferability_runs/aug15_runs_c10/unconstrained_lj/SPLD/c10_lj_SPLD.lammpstrj.gz
@@ -31,7 +31,7 @@ geom_prop/c10
 geom_prop/c20
 
 30                   1700           (lj,AA)                lammpstraj/aug15_transferability_runs/aug15_runs_c30/unconstrained_lj/c30_unbiased.lammpstrj.gz
-30                   1700           (wca,AA)               lammpstraj/aug15_transferability_runs/aug15_runs_c30/unconstrained_wca/30_unbiased.lammpstrj.gz
+30                   1700           (wca,AA)               lammpstraj/aug15_transferability_runs/aug15_runs_c30/unconstrained_wca/c30_unbiased.lammpstrj.gz
 30                   0000           (lj,SP)                modtraj/aug15_transferability_runs/aug15_runs_c30/unconstrained_lj/SP/c30_lj_SP.lammpstrj.gz
 30                   0000           (lj,SPLD)              modtraj/aug15_transferability_runs/aug15_runs_c30/unconstrained_lj/SPLD/c30_lj_SPLD.lammpstrj.gz
 30                   0000           (lj,LD)                modtraj/aug15_transferability_runs/aug15_runs_c30/unconstrained_lj/LD/c30_lj_LD.lammpstrj.gz

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-chain_lengths = [25]
+chain_lengths = [25, 10, 20, 30, 40, 50]
 sJobIn = file(os.path.expanduser('~/job.template')).read()
 
 lines = open('trajdata.txt', 'r').readlines()

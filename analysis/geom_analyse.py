@@ -17,12 +17,13 @@ def compute(trj, trajtype, measure, nmon = 25, npoly = 1, nwater = 1700):
     cgtype = trajtype[1]
     if cgtype == 'AA':  
         poly_indices = range(3*nwater, 3*nwater+nmon)
-        start = 0; stop = len(trj); freq = 100
+        start = 0; stop = len(trj); freq = 10
     else:   
         poly_indices = range(0,nmon)
-        start = 0; stop = len(trj); freq = 10
+        start = 0; stop = len(trj); freq = 1
     
-    Nframes = int((stop - start)/freq)
+    FrameRange = range(start, stop, freq)
+    Nframes = len(FrameRange)
     ind = 0
     if measure == 'SASA_atom':
         output = np.zeros([Nframes, nmon], np.float64)
@@ -30,7 +31,7 @@ def compute(trj, trajtype, measure, nmon = 25, npoly = 1, nwater = 1700):
         output = np.zeros(Nframes)
     
     pb = sim.utility.ProgressBar(Text = 'Processing frames....', Steps = Nframes)
-    for frame in xrange(start, stop, freq):
+    for frame in FrameRange:
         Pos = trj[frame][poly_indices]
         if doMinImage:
              for i in range(1,nmon):
@@ -77,7 +78,7 @@ def makeHist1D(z, nbins = 50, normalize = True):
     return (bin_centers, bin_vals)
     
     
-def makeHist2D(z0, z1, nbins = (125, 125), normalize = True):
+def makeHist2D(z0, z1, nbins = (100, 100), normalize = True):
     if not len(z0) == len(z1):
         raise TypeError('The 2 measures must have same # of computed samples')
     
@@ -96,14 +97,13 @@ def makeHist2D(z0, z1, nbins = (125, 125), normalize = True):
         assignment_1 = int((z1[i]-bin_min[1])/delta[1])
         bin_vals[assignment_0, assignment_1] += 1.0
         
-    #bin_vals /= Nframes
+    bin_vals /= Nframes
     if normalize:
         Row_norm = np.zeros(nbins[1])
         for i in range(nbins[1]):
             Row_norm[i] = np.trapz(bin_vals[i,:], bin_centers_1, dx = delta[1])
         
-        #norm = np.trapz(Row_norm, bin_centers_0, dx = delta[0])
-        norm = np.sum(bin_vals) * delta[0] * delta[1]
+        norm = np.trapz(Row_norm, bin_centers_0, dx = delta[0])
         bin_vals /= norm
     
     return ((bin_centers_0, bin_centers_1), bin_vals)
@@ -147,7 +147,7 @@ def main(TrajFile, trajtype, N_mon = 25, N_poly = 1, N_water = 1700, savedir = o
     # Computing
     for measure in Measures:
         if measure == 'pmf_Rg_R_EE' or isComputed(savedir, measure, trajtype):    continue  
-        print 'Computing %s...' % measure
+        print 'Computing %s for %s...' % (measure, trajtype)
         data = compute(trj = Trj, trajtype = trajtype, measure = measure, nmon = N_mon, npoly = N_poly, nwater = N_water)
         prefix = getFilePrefix(basedir = savedir, data_name = measure, data_type = 'measure', trajtype = trajtype)
         writeToFile(prefix, data)
