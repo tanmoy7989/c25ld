@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import numpy as npimport osimport sysimport pickleimport simfrom chem_data import getModelDatad = getModelData()poly_dict = d['poly_dict']cut_dict = d['cut_dict']
-TempSet = d['TempSet']
-
-RelaxSteps = 100000def MakeSys(fftype, BoxL, N_mon = 25, N_poly = 1, Prefix = 'FullSys',           isTest = False, isUmbrella = False):    """    Makes a Sys object based on LJ, Spline, Bond, Angle and Local Density potentials.    If it's a test run then only LJ, Bond and Angle potentials are generated.    """    np.random.seed(12345)    print 'Making system object...'    ## Making the world and the system
+import numpy as npimport osimport sysimport pickleimport sim
+RelaxSteps = 100000def MakeSys(paramdict, fftype, BoxL, N_mon = 25, N_poly = 1, Prefix = 'FullSys',           isTest = False, isUmbrella = False):    """    Makes a Sys object based on LJ, Spline, Bond, Angle and Local Density potentials.    If it's a test run then only LJ, Bond and Angle potentials are generated.    """    np.random.seed(12345)    print 'Making system object...'
+    ## Unpack the system parameters dict
+    poly_dict = paramdict['poly_dict']    cut_dict = paramdict['cut_dict']
+    TempSet = paramdict['TempSet']
+    ## Making the world and the system
     poly_dict['N_mon'] = N_mon
     poly_dict['N_poly'] = N_poly
     atomtype = sim.chem.AtomType("P", Mass = poly_dict["Mass_mon"], Color = (1,0,0), Radius = 0.5)    moltype = sim.chem.MolType("M", [atomtype] * poly_dict["N_mon"])    for i in range(0, poly_dict["N_mon"]-1):    moltype.Bond(i,i+1)    world = sim.chem.World([moltype], Dim = 3, Units = sim.units.AtomicUnits)    Sys = sim.system.System(world, Name = Prefix)    for i in range(poly_dict["N_poly"]): Sys += moltype.New()    ## Constructing the simulation box

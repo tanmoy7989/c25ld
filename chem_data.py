@@ -5,7 +5,7 @@ def getModelData():
 	""" Returns dictionaries containing data about the polymer-water system
 	    and about the different cutoffs used in the system
 	"""
-	poly_dict = {"N_mon": 25, "N_poly": 1,  "N_water" : 1700,
+	poly_dict = {    "N_mon": 25, "N_poly": 1,  "N_water" : 1700,
              	     "blength"      :   1.5300,     "Mass_mon"  :  16.0427,
               	     "Kbond"        :   400,   	     "r0"       :   1.53,
              	     "Kangle"       :  55.17204,    

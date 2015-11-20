@@ -15,7 +15,7 @@ poly_dict = d['poly_dict']
 cut_dict = d['cut_dict']
 TempSet = d['TempSet']
 
-NStep = {'Stepsize': 0.003, 'Equil': 1000000, 'Prod': 10000000, 'Freq': 100}
+NStep = {'Stepsize': 0.003, 'Equil': 2000000, 'Prod': 20000000, 'Freq': 100}
 
 
 def parseTraj(lammpstraj):
@@ -60,9 +60,11 @@ print "Number of polymer molecules = ", poly_dict["N_poly"]
 print "Number of monomers = ", poly_dict["N_mon"]
 print "Length of simulation box = ", boxlen
 	
+## Tinker LD cutoffs if required
+## put statements here
 
 ## Create the energy-minimized System object
-Sys = makesys.MakeSys(fftype = fftype, BoxL = boxlen, Prefix = Prefix)
+Sys = makesys.MakeSys(paramdict = d, fftype = fftype, BoxL = boxlen, Prefix = Prefix)
 Int = Sys.Int
 
 #shortcuts to potentials
