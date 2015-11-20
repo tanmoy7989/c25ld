@@ -33,10 +33,12 @@ conv_factor = kB * Temp
 
 # Extract data
 chain_length = int(sys.argv[1])
-lines = file('trajdata.txt', 'r').readlines()
-ind = [lines.index(line) for line in lines if line.startswith('%d' % chain_length)][-1] + 1
-savedir = os.path.join(analysis_dir, lines[ind].strip())
-
+if not sys.argv[2]:
+    lines = file('trajdata.txt', 'r').readlines()
+    ind = [lines.index(line) for line in lines if line.startswith('%d' % chain_length)][-1] + 1
+    savedir = os.path.join(analysis_dir, lines[ind].strip())
+else:
+    savedir = os.path.abspath(sys.argv[2])
 
 # Plot 1D histograms
 for measure in Measures[:-1]:
