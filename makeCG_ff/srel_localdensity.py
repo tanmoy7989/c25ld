@@ -35,17 +35,15 @@ def parseTraj(lammpstraj):
 		print 'Loading pre-Pickled trajectory...'
 		Trj = pickle.load(open(lammpstraj + '.pickle', 'r'))
 	Pos = Trj[0]
-    boxlen = Trj.FrameData["BoxL"]
+	boxlen = Trj.FrameData["BoxL"]
 	mappedatoms = []
-    for (i, AtomName) in enumerate(Trj.AtomNames):
-    	if AtomName == monomer_atomtype:
-        	mappedatoms.append(i)
+	for (i, AtomName) in enumerate(Trj.AtomNames):
+	   if AtomName == monomer_atomtype: mappedatoms.append(i)
+   	
    	if not len(mappedatoms) == poly_dict["N_mon"] * poly_dict["N_poly"]:
-    	raise ValueError("Number of atoms to map in trajectory does not match that in polydict")
-
-    return (Trj, boxlen, mappedatoms)
-
-
+   	    raise ValueError("Number of atoms to map in trajectory does not match that in polydict")
+   	
+   	return (Trj, boxlen, mappedatoms)
 
 
 ## Parse input reference trajectory
@@ -61,7 +59,10 @@ print "Number of monomers = ", poly_dict["N_mon"]
 print "Length of simulation box = ", boxlen
 	
 ## Tinker LD cutoffs if required
-## put statements here
+if fftype == 'wca':
+    Delta = 1.2
+    d['cut_dict']['LDCut'] = 7.8
+    d['cut_dict']['LDCut'] = 7.8 - Delta
 
 ## Create the energy-minimized System object
 Sys = makesys.MakeSys(paramdict = d, fftype = fftype, BoxL = boxlen, Prefix = Prefix)
@@ -74,6 +75,7 @@ Pbond = Sys.ForceField[2]
 Pangle = Sys.ForceField[3]
 Pld = Sys.ForceField[4]
 
+print Sys.ForceField.ParamString()
 
 #change to MD
 Int.Method = Int.Methods.VVIntegrate
@@ -88,7 +90,7 @@ for (i, a) in enumerate(Sys.Atom):
     Map += [sim.atommap.AtomMap(Atoms1 = mappedatoms[i], Atom2 = a)]
 
 ## Spline treatment
-Pspline.EneSlopeInner = None
+if fftype == 'wca': Pspline.EneSlopeInner = None
 
 ## Set up Srel optimizer
 Sys.TempSet = TempSet

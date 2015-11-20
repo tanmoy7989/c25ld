@@ -3,9 +3,8 @@
 import os, sys
 import numpy as np
 import pickle
-
-#sys.path.append(os.path.expanduser('~/c25ld/analysis'))
-from getBoxL import getNPTBoxLen
+import sim
+import pickleTraj
 
 ## Constant values
 fftypes = ['lj', 'wca']
@@ -13,15 +12,15 @@ cgtypes = ['SP', 'SPLD', 'LD']
 curr_dir = os.getcwd()
 sJobIn = file(os.path.expanduser('~/job.template')).read()
 
-## changed this function to get 
-## correct BoxLen appropriate to the chain length
-## T.S. 08/26/2015
+## correct boxlen obtained simply using 
+## very effective pickleTraj kept in ~/.scripts
+## 11/20/2015
+
 def getBoxL(AAdir, fftype, c_len):
 	parent_dir = os.path.join(AAdir, 'unconstrained_%s' % fftype)
-	restartfile = os.path.join(parent_dir, 'c%d_unbiased_relax.curr' % c_len)
-	ff_file = os.path.join(parent_dir, 'c%d.forcefield' % c_len)
-
-	boxlen = getNPTBoxLen(restartfile, ff_file)
+	trajfile = os.path.join(parent_dir, 'c%d_unbiased.lammpstrj.gz' % c_len)
+	trj = pickleTraj(TrajName = trajfile)
+	boxlen = trj.FrameData['BoxL'][0]
 	return boxlen
 	
 

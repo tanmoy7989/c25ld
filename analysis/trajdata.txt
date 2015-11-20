@@ -57,5 +57,5 @@ geom_prop/c40
 50                   0000           (lj,LD)                modtraj/aug15_transferability_runs/aug15_runs_c50/unconstrained_lj/LD/c50_lj_LD.lammpstrj.gz
 50                   0000           (wca,SP)               modtraj/aug15_transferability_runs/aug15_runs_c50/unconstrained_wca/SP/c50_wca_SP.lammpstrj.gz
 50                   0000           (wca,SPLD)             modtraj/aug15_transferability_runs/aug15_runs_c50/unconstrained_wca/SPLD/c50_wca_SPLD.lammpstrj.gz
-50                   0000          (wca,LD)               modtraj/aug15_transferability_runs/aug15_runs_c50/unconstrained_wca/LD/c50_wca_LD.lammpstrj.gz
+50                   0000           (wca,LD)               modtraj/aug15_transferability_runs/aug15_runs_c50/unconstrained_wca/LD/c50_wca_LD.lammpstrj.gz
 geom_prop/c50

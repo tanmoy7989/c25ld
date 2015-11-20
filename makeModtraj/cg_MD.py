@@ -6,8 +6,6 @@ import os
 import sim
 import sys
 
-useVis = False # Flag for visual-python tool
-
 sys.path.append(os.path.expanduser('~/c25ld'))
 import makesys
 from chem_data import getModelData
@@ -18,10 +16,8 @@ cut_dict = d['cut_dict']
 TempSet = d['TempSet']
 
 ## Iteration numbers
-NStep = {"Stepsize": 0.003, "StepFreq": 1000, "Equil": 1000000, "Prod": 20000000}
+NStep = {"Stepsize": 0.003, "StepFreq": 1000, "Equil": 2000000, "Prod": 20000000}
  
-
-
 def parseFF(filename):
     """
     parses out forcefield parameters from given filename
@@ -64,8 +60,14 @@ fftype = sys.argv[4]
 boxlen = sys.argv[5]
 cgtype = Prefix.split('_')[-1]
 
+## Tinker LD Cutoffs if required
+if fftype == 'wca': 
+    Delta = 1.2
+    d['cut_dict']['LDCut'] = 7.8
+    d['cut_dict']['LDLowerCut'] = 7.8 - Delta
+
 ## Generating an energy minimized system
-Sys = makesys.MakeSys(fftype, BoxL = boxlen, Prefix = Prefix, N_mon = c_len, N_poly = 1)
+Sys = makesys.MakeSys(paramdict = d, fftype = fftype, BoxL = boxlen, Prefix = Prefix, N_mon = c_len, N_poly = 1)
 Int = Sys.Int
 
 ## Loading the model forcefield into the system
@@ -76,17 +78,13 @@ Sys.ForceField.SetParamString(ffstring)
 Rg_measure = sim.measure.Rg(Sys, StepFreq = NStep['StepFreq'])
 Sys.Measures.extend([Rg_measure])
 
-
-## Adding a visualizer - only for debugging purposes
-if useVis:
-	import sim.system.visualize
-	Vis = sim.system.visualize.Visualizer3D(Sys, ShowBonds = True)
-	Vis.AddAction(Int, TimeFreq = 1.0)
-
 # Initialization
 sim.system.init.positions.CubicLattice(Sys, Random = 0.1)
 sim.system.init.velocities.Canonical(Sys, Temp = TempSet)
 
+print d
+print Sys.ForceField.ParamString()
+raw_input()
 
 ###############     DIFFERENT MD STEPS    ######################
 	
