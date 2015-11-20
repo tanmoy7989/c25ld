@@ -1,5 +1,18 @@
+#extraneous python and fortran files
 *.pyc
 *~
 *.so
 *.o
 /pylib/*
+
+#trajectories
+*.lammpstrj
+*.lammpstrj.gz
+
+#data
+*.dat
+*.txt
+
+#plots
+*.svg
+*.png
