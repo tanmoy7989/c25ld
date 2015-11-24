@@ -58,7 +58,7 @@ styles = {'AA': ('None', 'o'),
 axlist = [0] * nclen * 3
 
 def make1Dplot(geom_prop):
-	fig = plt.figure(figsize = (12,6), facecolor = 'w', edgecolor = 'w')
+	fig = plt.figure(figsize = (18,6), facecolor = 'w', edgecolor = 'w')
 	currax = 1
 	for cgtype in trajtypes[1:]:
 	   for n in range(nclen):
@@ -90,7 +90,7 @@ def make1Dplot(geom_prop):
 	       leg = ax.legend(loc = 'best', prop = {'size': 12})
 	       leg.get_frame().set_alpha(0.2)
 	   	
-	plt.subplots_adjust(hspace = 0.2, wspace = 0.2)      
+	plt.subplots_adjust(hspace = 0.2, wspace = 0.5)      
 	figname = os.path.join(savedir, geom_prop + '_' + fftype + fmt)
 	plt.savefig(figname, dpi = 300)
 

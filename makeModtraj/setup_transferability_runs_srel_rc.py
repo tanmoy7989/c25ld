@@ -35,3 +35,4 @@ for fftype in fftypes:
             sJob = os.path.join(CGdir, '%s_MD.sh' % Prefix)
             file(sJob, 'w').write(sJobIn % {'JOBNAME': 'md_srel_rc', 'CMD': cmdstring})
             os.system('chmod 777 %s' % sJob)
+            os.system('qsub %s' % sJob)

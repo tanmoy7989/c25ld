@@ -16,7 +16,7 @@ def compute(trj, trajtype, measure, nmon = 25, npoly = 1, nwater = 1700):
     
     cgtype = trajtype[1]
     if cgtype == 'AA':  
-        poly_indices = range(3*nwater, 3*nwater+nmon)
+        poly_indices = range(0, nmon) #using mapped traj now
         start = 0; stop = len(trj); freq = 10
     else:   
         poly_indices = range(0,nmon)
