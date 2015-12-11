@@ -35,7 +35,7 @@ python geom_analyse.py /home/cask0/home/tsanyal/c25ld/data/lammpstraj/polymer_tr
 
 python geom_analyse.py /home/cask0/home/tsanyal/c25ld/data/modtraj/polymer_transferability_runs/c10/unconstrained_lj/SP/c10_lj_SP.lammpstrj.gz "(lj,SP)" 10 1 0000 /home/cask0/home/tsanyal/c25ld/data/analysis/geom_prop/c10
 
-python geom_analyse.py /home/cask0/home/tsanyal/c25ld/data/modtraj/polymer_transferability_runs/aug15_runs_c10/unconstrained_lj/SPLD/c10_lj_SPLD.lammpstrj.gz "(lj,SPLD)" 10 1 0000 /home/cask0/home/tsanyal/c25ld/data/analysis/geom_prop/c10
+python geom_analyse.py /home/cask0/home/tsanyal/c25ld/data/modtraj/polymer_transferability_runs/c10/unconstrained_lj/SPLD/c10_lj_SPLD.lammpstrj.gz "(lj,SPLD)" 10 1 0000 /home/cask0/home/tsanyal/c25ld/data/analysis/geom_prop/c10
 
 python geom_analyse.py /home/cask0/home/tsanyal/c25ld/data/modtraj/polymer_transferability_runs/c10/unconstrained_lj/LD/c10_lj_LD.lammpstrj.gz "(lj,LD)" 10 1 0000 /home/cask0/home/tsanyal/c25ld/data/analysis/geom_prop/c10
 
