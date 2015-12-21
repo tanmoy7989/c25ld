@@ -1,0 +1,4 @@
+Contains all data of all chain lengths with new LD cutoff in 1 place for polymer
+To prevent further breaking of code, alg.py which contains all relevant system
+information and system generation code is still kept safe and stable in 
+~/srel_rc/
