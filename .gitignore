@@ -12,6 +12,7 @@
 #data
 *.dat
 *.txt
+*.pickle
 
 #plots
 *.svg
