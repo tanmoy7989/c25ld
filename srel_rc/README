@@ -1,0 +1,7 @@
+cg.py -- > coarse grain AA traj
+md.py -- > run MD simulation of CG model
+SrelBennett.py, dSreldrc.py -- > different Srel evaluation algorithms
+
+To do cg-md jobs: python main_cg_md.py <dirname>
+To do Srel vs rc analysis: python main_srel_rc.py <dirname>
+To plot results: python plot_deriv.py <fftype> <dirname> <cgtrajprefix>
