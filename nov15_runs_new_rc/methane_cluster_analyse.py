@@ -20,8 +20,9 @@ prefix = sys.argv[4]
 savedir = sys.argv[5]
 
 ## check if computation needs to be done
-pickleName = os.path.join(savedir, prefix + '.pickle')
-if os.path.isfile(pickleName):
+measurepickleName = os.path.join(savedir, 'measure', prefix + '.pickle')
+histpickleName = os.path.join(savedir, 'hist', prefix + '.pickle')
+if os.path.isfile(histpickleName):
     quit()
 
 ## pickle trajectory
@@ -37,23 +38,28 @@ boxl = trj.FrameData['BoxL']
 
 ## make bins
 bin_centers = range(0, nmethanes+1)
-bin_val = np.zeros(nmethanes+1, np.float64)
+bin_vals = np.zeros([nframes, nmethanes+1], np.float64)
+bin_val_final = np.zeros(nmethanes+1)
 
 ## frame stepping
 frameStatus = pb(Text = 'Reading frame by frame', Steps = nframes)
+count = 0
 for frame in frame_range:
 	## use clustering routine kept in sim
 	Pos = trj[frame]
 	clustdist, clustgroups = sim.geom.ClusterStats(Pos = Pos, BoxL = boxl, Cutoff = rdfcut[fftype])
-	bin_val += np.array(clustdist)
+	bin_vals[count, :] = np.array(clustdist)
+	bin_val_final += np.array(clustdist)
 	frameStatus.Update(frame/freq)
+	count += 1
 
 ## average over all the frames
-bin_val /= nframes
+bin_val_final /= nframes
 
 ## normalize data
 if Normalize:
-	bin_val /= np.sum(bin_val)
+	bin_val_final /= np.sum(bin_val_final)
 
 ## pickle data
-pickle.dump((bin_centers, bin_val), open(pickleName, 'w'))
+pickle.dump((bin_centers, bin_vals), open(measurepickleName, 'w'))
+pickle.dump((bin_centers, bin_val_final), open(histpickleName, 'w'))
