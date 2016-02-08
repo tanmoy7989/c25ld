@@ -8,8 +8,13 @@
 #trajectories
 *.lammpstrj
 *.lammpstrj.gz
+*.xtc
+*.gro
+*.curr
+*.prev
 
 #data
+/data
 *.dat
 *.txt
 *.pickle
@@ -17,3 +22,6 @@
 #plots
 *.svg
 *.png
+
+#shell-scripts
+
