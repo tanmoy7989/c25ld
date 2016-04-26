@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-import os, sys, pickle, copy
+import os, sys, pickle, copy, itertools
 import sim
 
 #dependencies
@@ -115,10 +115,18 @@ for frame in FrameRange:
         
         else:
             for n in range(N_mon):
-                Sys.ForceField.Eval(np.arange(n+1))
-                Ene = Sys.ForceField.Terms
-                EneSolv_atom[Ene_Ind, n] = (Ene[1] - Ene[0]) + Ene[-1]
-    
+                AtomIter = itertools.combinations(range(N_mon), n+1)
+                Iter = 0
+                while True:
+                    try:
+                        ANumList = list(AtomIter.next())
+                        Sys.ForceField.Eval(ANumList)
+                        Ene = Sys.ForceField.Terms
+                        EneSolv_atom[Ene_Ind, n] += (Ene[1] - Ene[0]) + Ene[-1]
+                        Iter += 1
+                    except StopIteration:
+                        EneSolv_atom[Ene_Ind, n] /= Iter
+                        break
     Ene_Ind += 1
     pb.Update(Ene_Ind)
 

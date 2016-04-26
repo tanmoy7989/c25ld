@@ -7,7 +7,11 @@ import sim
 import pickleTraj #kept in $HOME/.scripts
 
 ## GLOBALS
-Measures = ['Rg', 'R_EE', 'SASA_atom', 'kappa', 'pmf_Rg_R_EE']
+#Measures = ['Rg', 'R_EE', 'SASA_atom', 'kappa', 'pmf_Rg_R_EE']
+
+# only for the lj 7.8 case
+Measures = ['Rg', 'R_EE', 'pmf_Rg_R_EE']
+
 NMeasures = len(Measures)
 
 def compute(trj, trajtype, measure, nmon = 25, npoly = 1, nwater = 1700):
@@ -78,23 +82,40 @@ def makeHist1D(z, nbins = 50, normalize = True):
     return (bin_centers, bin_vals)
     
     
-def makeHist2D(z0, z1, nbins = (100, 100), normalize = True):
+def makeHist2D(z0, z1, fftype = 'wca', nbins = (100, 100), normalize = True):
     if not len(z0) == len(z1):
         raise TypeError('The 2 measures must have same # of computed samples')
     
-    Nframes = len(z0)        
-    bin_min = (0.98*z0.min(), 0.98*z1.min())
-    bin_max = (1.02*z0.max(), 1.02*z1.max())
+    Nframes = len(z0)     
+    pad = 0.02   
+    pad_max = 1+pad
+    pad_min = 1-pad
+    # bin ranges based on discussion with Scott - 04/04/2016
+    if fftype == 'wca':
+        bin_min = (pad_min*3.4, pad_min*3.10)
+        bin_max = (pad_max*8.0, pad_max*26.0)
+    elif fftype == 'lj':
+        bin_min = (pad_min*3.4, pad_min*3.10)
+        bin_max = (pad_max*8.0, pad_max*26.0)
+    
+    # bin ranges set previously
+    #bin_min = (pad_min*z0.min(), pad_min*z1.min())
+    #bin_max = (pad_max*z0.max(), pad_max*z1.max())
+    
+    print "Bin mins = ", bin_min
+    print "Bin maxs = ", bin_max
     delta = ((bin_max[0]-bin_min[0])/nbins[0], (bin_max[1]-bin_min[1])/nbins[1])
     bin_centers_0 = np.zeros(nbins[0]); bin_centers_1 = np.zeros(nbins[1])
     bin_vals = np.zeros([nbins[0], nbins[1]], np.float64)
 
-    for i in range(nbins[0]): bin_centers_0[i] = z0.min() + (i+0.5)*delta[0]
-    for i in range(nbins[1]): bin_centers_1[i] = z1.min() + (i+0.5)*delta[1]
+    for i in range(nbins[0]): bin_centers_0[i] = bin_min[0] + (i+0.5)*delta[0]
+    for i in range(nbins[1]): bin_centers_1[i] = bin_min[1] + (i+0.5)*delta[1]
     
     for i in range(Nframes):
         assignment_0 = int((z0[i]-bin_min[0])/delta[0])
         assignment_1 = int((z1[i]-bin_min[1])/delta[1])
+        if (assignment_0 < 0 or assignment_0 >= nbins[0]) or (assignment_1 < 0 or assignment_1 >= nbins[1]):
+            continue
         bin_vals[assignment_0, assignment_1] += 1.0
         
     bin_vals /= Nframes
@@ -140,7 +161,7 @@ def isBinned(basedir, hist, trajtype):
     else: return False
     
        
-def main(TrajFile, trajtype, N_mon = 25, N_poly = 1, N_water = 1700, savedir = os.getcwd()):
+def main(TrajFile, trajtype, fftype = 'wca', N_mon = 25, N_poly = 1, N_water = 1700, savedir = os.getcwd()):
 
     Trj = pickleTraj(os.path.abspath(TrajFile))
     
@@ -169,7 +190,7 @@ def main(TrajFile, trajtype, N_mon = 25, N_poly = 1, N_water = 1700, savedir = o
             R_EE_prefix = getFilePrefix(savedir, data_name = 'R_EE', data_type = 'measure', trajtype = trajtype)
             
             Rg = readFromFile(Rg_prefix); R_EE = readFromFile(R_EE_prefix)
-            hist = makeHist2D(Rg, R_EE)
+            hist = makeHist2D(Rg, R_EE, fftype = fftype)
             writeToFile(hist_prefix, hist)
 
 
@@ -185,4 +206,4 @@ trajtype = (fftype, cgtype)
 N_mon = int(sys.argv[3]); N_poly = int(sys.argv[4]) ; N_water = int(sys.argv[5])
 savedir = sys.argv[6]
 
-main(TrajFile, trajtype, N_mon, N_poly, N_water, savedir)                        
+main(TrajFile, trajtype, fftype, N_mon, N_poly, N_water, savedir)                        

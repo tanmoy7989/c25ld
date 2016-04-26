@@ -9,7 +9,7 @@ target_dir = sys.argv[1]
 
 
 # Look in write_LD_sensitivity_jobs.py
-lbls = ['lj', 'wca']
+lbls = ['wca']
 #lbls = ['spce']
 
 nrows = 3
@@ -29,9 +29,10 @@ for i, lbl in enumerate(lbls):
 	splot_count = 1
 	for j in range(NCuts):
 		this_LD = LD[:,j]
-		ind = np.argsort(this_LD);
-		this_LD = np.sort(this_LD)
-		this_NW = NW[ind]
+		this_NW = NW
+		#ind = np.argsort(this_LD);
+		#this_LD = np.sort(this_LD)
+		#this_NW = NW[ind]
 		
 		# calculating corrrelation statistics
 		Nobs = len(this_NW)

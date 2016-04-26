@@ -20,6 +20,8 @@ prefix = sys.argv[4]
 savedir = sys.argv[5]
 
 ## check if computation needs to be done
+if not os.path.isdir(os.path.join(savedir, 'measure')): os.mkdir(os.path.join(savedir, 'measure'))
+if not os.path.isdir(os.path.join(savedir, 'hist')): os.mkdir(os.path.join(savedir, 'hist'))
 measurepickleName = os.path.join(savedir, 'measure', prefix + '.pickle')
 histpickleName = os.path.join(savedir, 'hist', prefix + '.pickle')
 if os.path.isfile(histpickleName):

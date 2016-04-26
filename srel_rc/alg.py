@@ -51,6 +51,9 @@ def makeSys(LDCut, SysData, fftype = 'wca', BoxL = None, Prefix = 'methane_wca',
     Creates a system and assembles the potentials
     Most general case for both polymer and methane
     '''
+    
+    print paramstring
+    
     poly_dict = SysData['poly_dict']
     cut_dict = SysData['cut_dict']
     flag_dict = SysData['flag_dict']
@@ -88,7 +91,8 @@ def makeSys(LDCut, SysData, fftype = 'wca', BoxL = None, Prefix = 'methane_wca',
     LDFilter = sim.atomselect.PolyFilter([atomtype, atomtype], Ordered = True)
     LDRhoMin = 0.0
     LDRhoMax = 25
-    LDNKnot = int((LDRhoMax - LDRhoMin) + 1)
+    LDNKnot = int((LDRhoMax - LDRhoMin)+1)
+    #LDNKnot = 50 # doubling LDKnot to see if any change on methane potentials - 02/15/2016
     Plocaldensity = sim.potential.LocalDensity(Sys, Filter = LDFilter,
                                                Cut = LDCut, LowerCut = LDCut - Delta,
                                                NKnot = LDNKnot, RhoMin = LDRhoMin, RhoMax = LDRhoMax,

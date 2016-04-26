@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 from matplotlib.ticker import MaxNLocator
 
 # GLOBALS
-analysis_dir = os.path.expanduser('~/c25ld/data/analysis')
+analysis_dir = os.path.expanduser('./geom_prop/c25_longtraj')
 Measures = ['Rg', 'R_EE', 'kappa', 'SASA_atom', 'pmf_Rg_R_EE']
 cgtypes = ['AA', 'SP', 'SPLD', 'LD']
 fftypes = ['lj', 'wca']
