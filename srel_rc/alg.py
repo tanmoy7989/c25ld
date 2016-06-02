@@ -52,8 +52,6 @@ def makeSys(LDCut, SysData, fftype = 'wca', BoxL = None, Prefix = 'methane_wca',
     Most general case for both polymer and methane
     '''
     
-    print paramstring
-    
     poly_dict = SysData['poly_dict']
     cut_dict = SysData['cut_dict']
     flag_dict = SysData['flag_dict']
