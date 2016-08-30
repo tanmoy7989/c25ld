@@ -7,8 +7,8 @@ sys.path.append('/home/cask0/home/tsanyal/software')
 import mysim
 import sim
 
+Prefix = 'm25_srel'
 fixWW = True
-
 LammpsExec = 'lmp_tsanyal'
 sim.srel.base.DiffEneFracTol = 0.1
 sim.export.lammps.InnerCutoff = 0.05
@@ -16,30 +16,30 @@ sim.export.lammps.InnerCutoff = 0.05
 LammpsTraj = '/home/cask0/home/tsanyal/c25ld/data/lammpstraj/methane25/nvt/methane_wca_unbiased_single_site_water.lammpstrj.gz'
 
 def makeSys(LDCut = 7.8, NMethane = 25, NWater = 1700):
-	print 'Making system'
-	atomtypeM = sim.chem.AtomType('M', Mass = 16.0427, Charge = 0.0)
-	atomtypeW = sim.chem.AtomType('W', Mass = 18.0, Charge = 0.0)
-	moltypeM = sim.chem.MolType('M', [atomtypeM])
-	moltypeW = sim.chem.MolType('W', [atomtypeW])
-	world = sim.chem.World([moltypeM, moltypeW], Dim = 3, Units = sim.units.AtomicUnits)
-	Sys = sim.system.System(world, Name = 'findtimestep')
-	for i in range(NWater): Sys += moltypeW.New()
-	for i in range(NMethane): Sys += moltypeM.New()
+    print 'Making system'
+    atomtypeM = sim.chem.AtomType('M', Mass = 16.0427, Charge = 0.0)
+    atomtypeW = sim.chem.AtomType('W', Mass = 18.0, Charge = 0.0)
+    moltypeM = sim.chem.MolType('M', [atomtypeM])
+    moltypeW = sim.chem.MolType('W', [atomtypeW])
+    world = sim.chem.World([moltypeM, moltypeW], Dim = 3, Units = sim.units.AtomicUnits)
+    Sys = sim.system.System(world, Name = Prefix)
+    for i in range(NWater): Sys += moltypeW.New()
+    for i in range(NMethane): Sys += moltypeM.New()
 
-	Filter_MM = sim.atomselect.PolyFilter([atomtypeM, atomtypeM], MinBondOrd = MinBondOrd) 
-    Filter_MW = sim.atomselect.PolyFilter([atomtypeM, atomtypeW], MinBondOrd = MinBondOrd)
-    Filter_WW = sim.atomselect.PolyFilter([atomtypeW, atomtypeW], MinBondOrd = MinBondOrd)
+    Filter_MM = sim.atomselect.PolyFilter([atomtypeM, atomtypeM]) 
+    Filter_MW = sim.atomselect.PolyFilter([atomtypeM, atomtypeW])
+    Filter_WW = sim.atomselect.PolyFilter([atomtypeW, atomtypeW])
     Filter_MW_LD = sim.atomselect.PolyFilter([atomtypeM, atomtypeW], Ordered = True)
     Delta = 1.2
 
     Pspline_MM = sim.potential.PairSpline(Sys, Filter = Filter_MM, Cut = 10.0, NKnot = 30, Label = "SP_MM")
     Pspline_MW = sim.potential.PairSpline(Sys, Filter = Filter_MW, Cut = 10.0, NKnot = 30, Label = "SP_MW")
     Pspline_WW = sim.potential.PairSpline(Sys, Filter = Filter_WW, Cut = 10.0, NKnot = 30, Label = "SP_WW")
-    Plocaldensity_MW = sim.potential.LocalDensity(Sys, Filter = LDFilter, Cut = LDCut, LowerCut = LDCut - Delta, NKnot = 30, RhoMin = 0., RhoMax = NMethane, Label = "LD")
+    Plocaldensity_MW = sim.potential.LocalDensity(Sys, Filter = Filter_MW_LD, Cut = LDCut, LowerCut = LDCut - Delta, NKnot = 30, RhoMin = 0., RhoMax = NMethane, Label = "LD")
 
     if fixWW:
-    	WWSPKnots = eval(file(os.path.expanduser('~/c25ld/c25_single_site_water/water_spce/spce_ff.dat')).read())
-    	Pspline_WW.SetParams(Knots = WWSPKnots)
+        WWSPKnots = eval(file(os.path.expanduser('~/c25ld/c25_single_site_water/water_spce/spce_ff.dat')).read())
+        Pspline_WW.SetParam(Knots = WWSPKnots)
 
     Sys.ForceField.extend([Pspline_MM, Pspline_MW, Pspline_WW, Plocaldensity_MW])
     for P in Sys.ForceField: P.Arg.SetupHist(NBin = 1000, ReportNBin = 100)
@@ -48,22 +48,20 @@ def makeSys(LDCut = 7.8, NMethane = 25, NWater = 1700):
 
     Sys.Load()
 
-	Trj = pickleTraj(LammpsTraj)
-	Sys.BoxL = Trj.FrameData['BoxL']
-	Sys.TempSet = 298.0
-	sim.system.init.positions.CubicLatticeFill(Sys, Random = 0.1)
-	sim.system.init.velocities.Canonical(Sys, Temp = 298.0)
+    Trj = pickleTraj(LammpsTraj)
+    Sys.BoxL = Trj.FrameData['BoxL']
+    Sys.TempSet = 298.0
+    sim.system.init.positions.CubicLatticeFill(Sys, Random = 0.1)
+    sim.system.init.velocities.Canonical(Sys, Temp = 298.0)
 
-	Int = Sys.Int
-	for Method in Int.Methods:
-		if hasattr(Method, 'TimeStep'): Method.TimeStep = 3.e-3
+    Int = Sys.Int
+    for Method in Int.Methods:
+        if hasattr(Method, 'TimeStep'): Method.TimeStep = 3.e-3
 
-	return Sys
+    return Sys
 
 
 def runSrel(Sys):
-	Prefix = Sys.Name
-
     Trj = pickleTraj(LammpsTraj, Verbose = True)
     Map = sim.atommap.PosMap()
     for (i, a) in enumerate(Sys.Atom): Map += [sim.atommap.AtomMap(Atoms1 = i, Atom2 = a)] #1:1 mapping since using a mapped traj
