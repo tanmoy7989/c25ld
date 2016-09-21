@@ -3,15 +3,16 @@ from copy import copy
 import parse_potential as pp
 import pickleTraj
 
-sys.path.append('/home/cask0/home/tsanyal/software')
-import mysim
-import sim
+sys.path.append('/home/cask0/home/tsanyal/software') ; import mysim ; import sim
 
 Prefix = 'm25_srel'
 fixWW = True
-LammpsExec = 'lmp_tsanyal'
+sim.export.lammps.LammpsExec = os.path.expanduser('~/software/tanmoy_lammps/lammps-15May15/src/lmp_ZIN')
 sim.srel.base.DiffEneFracTol = 0.1
 sim.export.lammps.InnerCutoff = 0.05
+
+sim.export.lammps.useParallel = True
+sim.export.lammps.NCores = 8
 
 LammpsTraj = '/home/cask0/home/tsanyal/c25ld/data/lammpstraj/methane25/nvt/methane_wca_unbiased_single_site_water.lammpstrj.gz'
 
@@ -85,6 +86,7 @@ def runSrel(Sys):
     Opt = sim.srel.OptimizeTrajLammpsClass(Sys, Map, Traj = Trj, SaveLoadArgData = True, FilePrefix = Prefix, Verbose = True)
     sim.srel.optimizetraj.PlotFmt = 'svg'
     Opt.MinReweightFrac = 0.2
+    Opt.TempFileDir = os.getcwd()
     
     opt_cases = ['SP', 'SPLD']
     for i, case in enumerate(opt_cases):
@@ -97,4 +99,4 @@ def runSrel(Sys):
             Plocaldensity.UnfreezeParam()
             
         Sys.ForceField.Update()
-        Opt.RunConjugateGradient(StepsEquil = 1000000, StepsProd = 2000000, StepsStride = 500) 
+        Opt.RunConjugateGradient(StepsEquil = 10000000, StepsProd = 20000000, StepsStride = 500) 
