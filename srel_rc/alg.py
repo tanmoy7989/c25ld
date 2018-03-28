@@ -122,6 +122,9 @@ def makeSys(LDCut, SysData, fftype = 'wca', BoxL = None, Prefix = 'methane_wca',
   
     Sys.Load()
     
+    
+    print Sys.ForceField.ParamString()
+    
     return Sys
    
 

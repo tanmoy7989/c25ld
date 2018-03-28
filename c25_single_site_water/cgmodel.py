@@ -44,8 +44,8 @@ def makeSys(LDCut = 7.8, NMethane = 25, NWater = 1700):
 
     Sys.ForceField.extend([Pspline_MM, Pspline_MW, Pspline_WW, Plocaldensity_MW])
     for P in Sys.ForceField: P.Arg.SetupHist(NBin = 1000, ReportNBin = 100)
-    #Sys.ForceField.SetSplineTreatment(NonbondEneSlope = 50., BondEneSlope = 10., AngleEneSlope = 60.)
-    for Pspline in [Pspline_MM, Pspline_MW, Pspline_WW]: Pspline.EneSlopeInner = None
+    Sys.ForceField.SetSplineTreatment(NonbondEneSlope = 50., BondEneSlope = 10., AngleEneSlope = 60.)
+    #for Pspline in [Pspline_MM, Pspline_MW, Pspline_WW]: Pspline.EneSlopeInner = None
 
     Sys.Load()
 
@@ -57,7 +57,7 @@ def makeSys(LDCut = 7.8, NMethane = 25, NWater = 1700):
 
     Int = Sys.Int
     for Method in Int.Methods:
-        if hasattr(Method, 'TimeStep'): Method.TimeStep = 3.e-3
+        if hasattr(Method, 'TimeStep'): Method.TimeStep = 3./ 48.9
 
     return Sys
 

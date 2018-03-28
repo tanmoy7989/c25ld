@@ -46,5 +46,5 @@ sim.system.init.velocities.Canonical(Sys, Temp = 298.0)
 print Sys.ForceField.ParamString()
 
 # find timestep
-sim.integrate.velverlet.FindTimeStepLammps(Sys, NSteps = 2000000, GuessTimeStep = 3.e-3)
+sim.integrate.velverlet.FindTimeStepLammps(Sys, NSteps = 1000000, GuessTimeStep = 3.e-3)
 

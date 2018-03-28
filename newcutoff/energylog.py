@@ -11,7 +11,7 @@ sys.path.append('/home/cask0/home/tsanyal/c25ld/srel_rc')
 import alg
 
 DEBUG = False
-calcAtomEne = True
+calcAtomEne = False
 
 # user input
 fftype = sys.argv[1]
@@ -28,7 +28,7 @@ if calcAtomEne: Prefix += '_atom'
     
 
 #check if already computed
-LogFileName = '/home/cask0/home/tsanyal/c25ld/nov15_runs_new_rc/geom_prop/energy_logs/%s_energy.pickle' % Prefix
+LogFileName = '/home/cask0/home/tsanyal/c25ld/newcutoff/geom_prop/energy_logs/%s_energy.pickle' % Prefix
 #if os.path.isfile(LogFileName): exit()
 
 #system parameters
@@ -37,8 +37,8 @@ TempSet = 298.0
 Delta = 1.2
 
 #CG forcefield parameters
-cg_ff_file = cgffPrefix + '_sum.txt'
-paramstring = pp.parseParamString(cg_ff_file)
+cg_ff_file = cgffPrefix + '_ff.dat'
+paramstring = file(cg_ff_file).read()
 
 #boxlength extracted from AA traj
 Trj = pickleTraj(LammpsTraj)

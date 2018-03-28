@@ -61,7 +61,7 @@ def getmol_id(pdbline):
 			mol_id = int(mol_id)
 
 	if pdbline.split()[3]=="pol":
-		mol_id = int(pdbline.split()[4][1:])
+		mol_id = int(pdbline.split()[5])
 
 
 
